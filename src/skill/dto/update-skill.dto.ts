@@ -3,4 +3,4 @@ export class UpdateSkillDto {
     @IsString()
     @IsOptional()
     designation?: string;
-}g
+}

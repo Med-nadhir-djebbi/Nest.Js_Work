@@ -19,7 +19,7 @@ export class Cv {
   path: string;
   @ManyToOne(() => User, (user) => user.cvs, { nullable: true })
   @JoinColumn()
-  user: User;
+  user: User | null;
   @ManyToMany(() => Skill, (skill) => skill.cvs, { cascade: true })
   @JoinTable()
   skills: Skill[];

@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsNotEmpty } from 'class-validator';
+import { IsString, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
 export class CreateCvDto {
   @IsString()
   @IsNotEmpty()
@@ -18,4 +18,7 @@ export class CreateCvDto {
   @IsString()
   @IsNotEmpty()
   path: string;
+  @IsInt()
+  @IsOptional()
+  userId?: number;
 }
