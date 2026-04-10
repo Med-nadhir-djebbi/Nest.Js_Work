@@ -12,6 +12,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_module_1 = require("./user/user.module");
 const cv_module_1 = require("./cv/cv.module");
 const skill_module_1 = require("./skill/skill.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,6 +28,7 @@ exports.AppModule = AppModule = __decorate([
             user_module_1.UserModule,
             cv_module_1.CvModule,
             skill_module_1.SkillModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [],
         providers: [],
