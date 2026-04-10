@@ -3,9 +3,9 @@ import { Cv } from '../../cv/entities/cv.entity';
 @Entity()
 export class Skill {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
   @Column()
-  designation: string;
+  designation!: string;
   @ManyToMany(() => Cv, (cv) => cv.skills)
-  cvs: Cv[];
+  cvs!: Cv[];
 }

@@ -4,23 +4,23 @@ import { Skill } from '../../skill/entities/skill.entity';
 @Entity()
 export class Cv {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
   @Column()
-  name: string;
+  name!: string;
   @Column()
-  firstname: string;
+  firstname!: string;
   @Column()
-  age: number;
+  age!: number;
   @Column({ unique: true })
-  cin: string;
+  cin!: string;
   @Column()
-  job: string;
+  job!: string;
   @Column()
-  path: string;
+  path!: string;
   @ManyToOne(() => User, (user) => user.cvs, { nullable: true })
   @JoinColumn()
-  user: User | null;
+  user!: User | null;
   @ManyToMany(() => Skill, (skill) => skill.cvs, { cascade: true })
   @JoinTable()
-  skills: Skill[];
+  skills!: Skill[];
 }

@@ -12,6 +12,8 @@ const typeorm_1 = require("@nestjs/typeorm");
 const user_module_1 = require("./user/user.module");
 const cv_module_1 = require("./cv/cv.module");
 const skill_module_1 = require("./skill/skill.module");
+const app_controller_1 = require("./app.controller");
+const app_service_1 = require("./app.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,8 +30,8 @@ exports.AppModule = AppModule = __decorate([
             cv_module_1.CvModule,
             skill_module_1.SkillModule,
         ],
-        controllers: [],
-        providers: [],
+        controllers: [app_controller_1.AppController],
+        providers: [app_service_1.AppService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

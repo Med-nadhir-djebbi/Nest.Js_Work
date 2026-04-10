@@ -1,28 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { UserService } from './user/user.service';
-import { CreateUserDto } from './user/dto/create-user.dto';
-import { UpdateUserDto } from './user/dto/update-user.dto';
-@Controller('users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
   @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  getHello(): string {
+    return this.appService.getHello();
   }
 }
