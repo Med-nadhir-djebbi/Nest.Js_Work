@@ -1,7 +1,6 @@
 import { 
   Injectable, 
-  NotFoundException, 
-  ForbiddenException 
+  NotFoundException 
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -23,13 +22,13 @@ export class CvService {
     return this.cvRepository.save(cv);
   }
 
-  async findAll(user?: User): Promise<Cv[]> {
-    if (!user || user.role === 'admin') {
-      return this.cvRepository.find({ relations: ['user', 'skills'] });
-    }
+  async findAll(): Promise<Cv[]> {
+    return this.cvRepository.find({ relations: ['user', 'skills'] });
+  }
 
+  async findAllByUser(userId: number): Promise<Cv[]> {
     return this.cvRepository.find({ 
-      where: { user: { id: user.id } },
+      where: { user: { id: userId } },
       relations: ['user', 'skills'] 
     });
   }
@@ -43,24 +42,13 @@ export class CvService {
     return cv;
   }
 
-  async update(id: number, updateCvDto: UpdateCvDto, user: User): Promise<Cv> {
-    const cv = await this.findOne(id);
-
-    if (cv.user?.id !== user.id && user.role !== 'admin') {
-      throw new ForbiddenException('Vous n\'êtes pas autorisé à modifier ce CV');
-    }
-
+  async update(id: number, updateCvDto: UpdateCvDto): Promise<Cv> {
+    await this.findOne(id); 
     await this.cvRepository.update(id, updateCvDto);
     return this.findOne(id);
   }
 
-  async remove(id: number, user: User): Promise<void> {
-    const cv = await this.findOne(id);
-
-    if (cv.user?.id !== user.id && user.role !== 'admin') {
-      throw new ForbiddenException('Vous n\'êtes pas autorisé à supprimer ce CV');
-    }
-
+  async remove(id: number): Promise<void> {
     const result = await this.cvRepository.delete(id);
     if (result.affected === 0) throw new NotFoundException(`CV with ID ${id} not found`);
   }
