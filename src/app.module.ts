@@ -5,6 +5,7 @@ import { CvModule } from './cv/cv.module';
 import { SkillModule } from './skill/skill.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -16,6 +17,7 @@ import { AppService } from './app.service';
     UserModule,
     CvModule,
     SkillModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
