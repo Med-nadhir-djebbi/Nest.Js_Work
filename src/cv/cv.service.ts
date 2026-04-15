@@ -7,7 +7,6 @@ import { Repository } from 'typeorm';
 import { Cv } from './entities/cv.entity';
 import { CreateCvDto } from './dto/create-cv.dto';
 import { UpdateCvDto } from './dto/update-cv.dto';
-import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class CvService {
@@ -16,9 +15,12 @@ export class CvService {
     private cvRepository: Repository<Cv>,
   ) {}
 
-  async create(createCvDto: CreateCvDto, user: User): Promise<Cv> {
+  async create(createCvDto: CreateCvDto, userId: number): Promise<Cv> {
     const { skills, ...cvData } = createCvDto;
-    const cv = this.cvRepository.create({ ...cvData, user });
+    const cv = this.cvRepository.create({
+      ...cvData,
+      user: { id: userId },
+    });
     return this.cvRepository.save(cv);
   }
 
@@ -42,14 +44,28 @@ export class CvService {
     return cv;
   }
 
-  async update(id: number, updateCvDto: UpdateCvDto): Promise<Cv> {
-    await this.findOne(id); 
-    await this.cvRepository.update(id, updateCvDto);
+  async update(id: number, updateCvDto: UpdateCvDto, userId: number): Promise<Cv> {
+    const cv = await this.findOneByIdAndUser(id, userId);
+    Object.assign(cv, updateCvDto);
+    await this.cvRepository.save(cv);
     return this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
-    const result = await this.cvRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException(`CV with ID ${id} not found`);
+  async remove(id: number, userId: number): Promise<void> {
+    const cv = await this.findOneByIdAndUser(id, userId);
+    await this.cvRepository.remove(cv);
+  }
+
+  private async findOneByIdAndUser(id: number, userId: number): Promise<Cv> {
+    const cv = await this.cvRepository.findOne({
+      where: { id, user: { id: userId } },
+      relations: ['user', 'skills'],
+    });
+
+    if (!cv) {
+      throw new NotFoundException(`CV with ID ${id} not found`);
+    }
+
+    return cv;
   }
 }

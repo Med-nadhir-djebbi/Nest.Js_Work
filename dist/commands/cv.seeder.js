@@ -28,7 +28,7 @@ async function bootstrap() {
             cin: Math.floor(Math.random() * 10000000).toString(),
             job: (0, falso_1.randJobTitle)(),
             path: '/cv/path'
-        }, randomUser);
+        }, randomUser.id);
     }
     console.log('Seeding done');
     await app.close();

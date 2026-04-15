@@ -41,54 +41,72 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_1 = require("@nestjs/jwt");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
+const user_entity_1 = require("../user/entities/user.entity");
 const bcrypt = __importStar(require("bcrypt"));
-const user_service_1 = require("../user/user.service");
+const jwt_1 = require("@nestjs/jwt");
 let AuthService = class AuthService {
-    userService;
+    userRepository;
     jwtService;
-    constructor(userService, jwtService) {
-        this.userService = userService;
+    constructor(userRepository, jwtService) {
+        this.userRepository = userRepository;
         this.jwtService = jwtService;
     }
-    async validateUser(username, password) {
-        const user = await this.userService.findByUsername(username);
-        if (user && await bcrypt.compare(password, user.password)) {
-            const { password, ...result } = user;
-            return result;
-        }
-        return null;
-    }
-    async login(username, password) {
-        const user = await this.validateUser(username, password);
-        if (!user)
-            throw new common_1.UnauthorizedException('Invalid credentials');
-        const payload = { username: user.username, sub: user.id, role: user.role };
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
-    }
-    async register(registerDto) {
-        const existing = await this.userService.findByUsername(registerDto.username);
-        if (existing)
-            throw new common_1.ConflictException('Username already exists');
-        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-        const user = await this.userService.create({
-            ...registerDto,
+    async register(registerUserDto) {
+        const { username, email, password } = registerUserDto;
+        const salt = await bcrypt.genSalt();
+        const hashedPassword = await bcrypt.hash(password, salt);
+        const user = this.userRepository.create({
+            username,
+            email,
             password: hashedPassword,
-            role: 'user',
         });
-        const { password, ...result } = user;
-        return result;
+        try {
+            await this.userRepository.save(user);
+            return {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                role: user.role
+            };
+        }
+        catch (error) {
+            throw new common_1.ConflictException('Username or email already exists');
+        }
+    }
+    async login(loginCredentialsDto) {
+        const { username, password } = loginCredentialsDto;
+        const user = await this.userRepository.findOne({ where: { username } });
+        if (!user) {
+            throw new common_1.NotFoundException('Wrong username or password');
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new common_1.UnauthorizedException('Wrong username or password');
+        }
+        const payload = {
+            username: user.username,
+            email: user.email,
+            role: user.role,
+        };
+        const jwt = this.jwtService.sign(payload);
+        return {
+            access_token: jwt,
+        };
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [user_service_1.UserService,
+    __param(0, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
         jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

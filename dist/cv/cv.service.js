@@ -22,12 +22,22 @@ let CvService = class CvService {
     constructor(cvRepository) {
         this.cvRepository = cvRepository;
     }
-    async create(createCvDto, user) {
-        const cv = this.cvRepository.create({ ...createCvDto, user });
+    async create(createCvDto, userId) {
+        const { skills, ...cvData } = createCvDto;
+        const cv = this.cvRepository.create({
+            ...cvData,
+            user: { id: userId },
+        });
         return this.cvRepository.save(cv);
     }
-    findAll() {
+    async findAll() {
         return this.cvRepository.find({ relations: ['user', 'skills'] });
+    }
+    async findAllByUser(userId) {
+        return this.cvRepository.find({
+            where: { user: { id: userId } },
+            relations: ['user', 'skills']
+        });
     }
     async findOne(id) {
         const cv = await this.cvRepository.findOne({
@@ -38,14 +48,25 @@ let CvService = class CvService {
             throw new common_1.NotFoundException(`CV with ID ${id} not found`);
         return cv;
     }
-    async update(id, updateCvDto) {
-        await this.cvRepository.update(id, updateCvDto);
+    async update(id, updateCvDto, userId) {
+        const cv = await this.findOneByIdAndUser(id, userId);
+        Object.assign(cv, updateCvDto);
+        await this.cvRepository.save(cv);
         return this.findOne(id);
     }
-    async remove(id) {
-        const result = await this.cvRepository.delete(id);
-        if (result.affected === 0)
+    async remove(id, userId) {
+        const cv = await this.findOneByIdAndUser(id, userId);
+        await this.cvRepository.remove(cv);
+    }
+    async findOneByIdAndUser(id, userId) {
+        const cv = await this.cvRepository.findOne({
+            where: { id, user: { id: userId } },
+            relations: ['user', 'skills'],
+        });
+        if (!cv) {
             throw new common_1.NotFoundException(`CV with ID ${id} not found`);
+        }
+        return cv;
     }
 };
 exports.CvService = CvService;

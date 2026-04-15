@@ -18,7 +18,7 @@ class CreateCvDto {
     cin;
     job;
     path;
-    userId;
+    skills;
 }
 exports.CreateCvDto = CreateCvDto;
 __decorate([
@@ -52,8 +52,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCvDto.prototype, "path", void 0);
 __decorate([
-    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsInt)({ each: true }),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Number)
-], CreateCvDto.prototype, "userId", void 0);
+    __metadata("design:type", Array)
+], CreateCvDto.prototype, "skills", void 0);
 //# sourceMappingURL=create-cv.dto.js.map

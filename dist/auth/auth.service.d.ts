@@ -1,25 +1,14 @@
+import { Repository } from 'typeorm';
+import { User } from '../user/entities/user.entity';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginCredentialsDto } from './dto/login-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
-import { RegisterDto } from './dto/register.dto';
 export declare class AuthService {
-    private userService;
+    private userRepository;
     private jwtService;
-    constructor(userService: UserService, jwtService: JwtService);
-    validateUser(username: string, password: string): Promise<{
-        id: number;
-        username: string;
-        email: string;
-        role: string;
-        cvs: import("../cv/entities/cv.entity").Cv[];
-    } | null>;
-    login(username: string, password: string): Promise<{
+    constructor(userRepository: Repository<User>, jwtService: JwtService);
+    register(registerUserDto: RegisterUserDto): Promise<Partial<User>>;
+    login(loginCredentialsDto: LoginCredentialsDto): Promise<{
         access_token: string;
-    }>;
-    register(registerDto: RegisterDto): Promise<{
-        id: number;
-        username: string;
-        email: string;
-        role: string;
-        cvs: import("../cv/entities/cv.entity").Cv[];
     }>;
 }
